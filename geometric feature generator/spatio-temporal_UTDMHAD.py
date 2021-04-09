@@ -279,7 +279,7 @@ def feature_extraction(skel_paths,folder):
       featurelist[i,:] =np.floor( (featurelist[i,:] - minimum) / (maximum -minimum)  * (255.0-0))
     featurelist=featurelist.astype(np.uint8)
     im_color=cv2.applyColorMap(featurelist, cv2.COLORMAP_JET)
-    im =cv2.resize(im_color,(256,featurelist.shape[1]),interpolation=cv2.INTER_CUBIC)
+    im =cv2.resize(im_color,(featurelist.shape[1],100),interpolation=cv2.INTER_CUBIC)
     print(im.shape)
     val= ['s2','s3','s7']
     folderpath='/content/drive/MyDrive/UTD-MHAD/Features/'+ folder + r'/'
