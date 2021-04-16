@@ -1,1 +1,1 @@
-# har-cnn
+# Skeleton-based-HAR
