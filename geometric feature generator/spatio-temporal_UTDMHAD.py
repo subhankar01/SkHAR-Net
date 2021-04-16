@@ -86,6 +86,19 @@ def JJd_features(current,numframes): # feature 1
   featurelist = np.array(featurelist)
   return featurelist
 
+def JJv_features(current,numframes): #feature 2
+  
+  featurelist=[]
+  for t in range(numframes):
+    xyz = current[t,:,:]
+    feature = []
+    for i in range(0,20):
+      for j in range (0,i):
+        JJ_v_ij=JJ_o(xyz,i,j)
+        feature.append(JJ_v_ij)
+    featurelist.append(feature)
+  featurelist = np.array(featurelist)
+  return featurelist
 def JJo_features(current,numframes): #feature 2
   
   featurelist=[]
@@ -112,22 +125,6 @@ def JLd_features(current,numframes): #feature 3
         q=line[1]
         JLd=JL_d(xyz,i,p,q)
         feature.append(JLd)
-    featurelist.append(feature)
-  featurelist = np.array(featurelist)
-  return featurelist
-
-def angle_features(current,numframes): #feature 4
-  featurelist=[]
-  for t in range(numframes):
-    xyz = current[t,:,:]
-    feature = []
-    for i in range(0,20):
-      for j in range (0,i):
-        for k in range(0,j):
-          ai,aj,ak=angle(xyz,i,j,k)
-          feature.append(ai)
-          feature.append(aj)
-          feature.append(ak)
     featurelist.append(feature)
   featurelist = np.array(featurelist)
   return featurelist
@@ -189,7 +186,7 @@ def PPa_features(current,numframes):
 
 #-----------------------------------------------------------
 #Temporal
-def dist_motion_features(current,numframes):
+def JJd_motion_features(current,numframes):
   
   featurelist =JJd_features(current,numframes)
   L=5  # frame interval
@@ -199,15 +196,24 @@ def dist_motion_features(current,numframes):
   featurelist = np.array(featurelist)
   return featurelist
 
-def angular_motion_features(current,numframes):
-
-  featurelist =angle_features(current,numframes)
+def JJv_motion_features(current,numframes):
+  featurelist =JJv_features(current,numframes)
   L=5  # frame interval
   for t in range(numframes-L):
     featurelist[t,:]=featurelist[t,:] - featurelist[t+L,:]
   featurelist=featurelist[:numframes-L,:]
   featurelist = np.array(featurelist)
   return featurelist
+
+def JJo_motion_features(current,numframes):
+  featurelist =JJo_features(current,numframes)
+  L=5  # frame interval
+  for t in range(numframes-L):
+    featurelist[t,:]=featurelist[t,:] - featurelist[t+L,:]
+  featurelist=featurelist[:numframes-L,:]
+  featurelist = np.array(featurelist)
+  return featurelist
+
 
 def JLd_motion_features(current,numframes):
   featurelist =JLd_features(current,numframes)
@@ -245,6 +251,8 @@ def PPa_motion_features(current,numframes):
   featurelist = np.array(featurelist)
   return featurelist
 
+
+
 def feature_extraction(skel_paths,folder):
   for path in tqdm.tqdm(skel_paths):
     filename = path.split('/')[4]
@@ -256,49 +264,50 @@ def feature_extraction(skel_paths,folder):
     current = np.transpose(current , (2,0,1))
     print(current.shape)
     numframes = current.shape[0]
-    if folder=='JJ_d':
-      featurelist =JJd_features(current,numframes) #1
-    elif folder=='JJ_o':
-      featurelist =JJo_features(current,numframes) #2
-    elif folder=='angle':
-      featurelist =angle_features(current,numframes)#3
-    elif folder=='PP_a':
-      featurelist =PPa_features(current,numframes)#4
-    elif folder=='dist_motion':
-      featurelist =dist_motion_features(current,numframes) #5
-    elif folder=='angular_motion':
-      featurelist =angular_motion_features(current,numframes) #6
+    if folder=='JJd_motion':
+      featurelist =JJd_motion_features(current,numframes) # 1(temporal)
     elif folder=='LLa_motion':
-      featurelist =LLa_motion_features(current,numframes) #7
-    elif folder=='LPa_motion':
-      featurelist =LPa_motion_features(current,numframes) #8
+      featurelist =LLa_motion_features(current,numframes)#2 (temporal)
+    elif folder=='JLd_motion':
+      featurelist =JLd_motion_features(current,numframes)#3 (temporal)
+    elif folder=='JJo':
+      featurelist =JJo_features(current,numframes) #4 (spatial)
+    elif folder=='LPa':
+      featurelist =LPa_features(current,numframes) #5(spatial)
+    elif folder=='PPa':
+      featurelist =PPa_features(current,numframes) #6(spatial)
     print(featurelist.shape)
-    for i in range(featurelist.shape[0]):
-      maximum = np.max(featurelist[i])
-      minimum = np.min(featurelist[i])
-      featurelist[i,:] =np.floor( (featurelist[i,:] - minimum) / (maximum -minimum)  * (255.0-0))
-    featurelist=featurelist.astype(np.uint8)
-    im_color=cv2.applyColorMap(featurelist, cv2.COLORMAP_JET)
-    im =cv2.resize(im_color,(featurelist.shape[1],100),interpolation=cv2.INTER_CUBIC)
-    print(im.shape)
-    val= ['s2','s3','s7']
-    folderpath='/content/drive/MyDrive/UTD-MHAD/Features/'+ folder + r'/'
-    if subject in val:
-      filepath =folderpath + 'val/'
+    if folder=='JJd_motion' or folder=='LLa_motion' or folder=='JLd_motion' or folder=='JJo' or folder=='LPa' or folder=='PPa':
+      for i in range(featurelist.shape[0]):
+        maximum = np.max(featurelist[i])
+        minimum = np.min(featurelist[i])
+        featurelist[i,:] =np.floor( (featurelist[i,:] - minimum) / (maximum -minimum)  * (255.0-0))
+      featurelist=featurelist.astype(np.uint8)
+      im =cv2.resize(featurelist,(256,256),interpolation=cv2.INTER_CUBIC)
+      im_color=cv2.applyColorMap(im, cv2.COLORMAP_JET)
+      print(im_color.shape)
+      val= ['s2','s4','s8']
+      folderpath='/content/drive/MyDrive/UTD-MHAD/Features/Image/'+ folder + r'/'
+      if subject in val:
+        filepath =folderpath + 'val/'
+      else:
+        filepath =folderpath + 'train/'
+      filedir = filepath + action
+      if not os.path.exists(filedir):
+        os.mkdir(filedir)
+      filepath = filepath + action + r'/' + filename.replace('.mat','.jpg')
+      cv2.imwrite(filepath,im_color)
     else:
-      filepath =folderpath + 'train/'
-    
-    filedir = filepath + action
-    if not os.path.exists(filedir):
-      os.mkdir(filedir)
-    
-    filepath = filepath + action + r'/' + filename.replace('.mat','.jpg')
-    cv2.imwrite(filepath,im)
+      print(featurelist.shape)
+      folderpath='/content/drive/MyDrive/UTD-MHAD/Features/'+ folder + r'/'
+      filepath = folderpath + filename.replace('.mat','.npy')
+      np.save(filepath,featurelist)
+
 
 def main():
   data_path = '/content/UTD-MHAD/Skeleton/'
   skel_paths = glob.glob(os.path.join(data_path, '*.mat'))
-  folders=['JJ_d','angle','JJ_o','PP_a','dist_motion','angular_motion','LLa_motion','LPa_motion']
+  folders=['JJd_motion','LLa_motion','JLd_motion','JJo','LPa','PPa']
   for f in folders:
     status1="-----------------------"+f+" extraction : started--------------------------"
     status2="-----------------------"+f+" extraction process ended----------------------"
