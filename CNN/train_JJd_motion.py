@@ -1,7 +1,6 @@
 import os
 from os.path import basename, join, exists
 os.chdir(r"/UTD-MHAD/Features/Image/JJd_motion")
-!ls
 folder=r"train/"
 total=0
 print('---Training set details----')
