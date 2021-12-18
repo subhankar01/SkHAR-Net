@@ -1,6 +1,6 @@
 import os
 from os.path import basename, join, exists
-os.chdir(r"/UTD-MHAD/Features/Image/JLd_motion")
+os.chdir(r"/UTD-MHAD/Features/Image/PPa")
 !ls
 folder=r"train/"
 total=0
@@ -161,7 +161,7 @@ AlexNet.summary()
 sgd = SGD(lr = 0.05, momentum = 0.9, clipnorm = 1.0)
 AlexNet.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
-checkpoint1 = ModelCheckpoint('/UTD-MHAD/Features/Image/JLd_motion/JLd_motion_weights.h5', monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
+checkpoint1 = ModelCheckpoint('/UTD-MHAD/Features/Image/PPa/PPa_weights.h5', monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.7, min_delta = 0.0005,
                               patience=20, min_lr=0.0001, verbose = 1)
 callbacks_list = [checkpoint1,reduce_lr]
@@ -190,9 +190,9 @@ plt.xlabel('Epoch')
 plt.legend(['Train','Validation'], loc='upper left')
 plt.show()
 
-AlexNet.save('/content/drive/MyDrive/UTD-MHAD/Features/Image/JLd_motion/JLd_motion_model.h5')
-loaded_model=load_model('/content/drive/MyDrive/UTD-MHAD/Features/Image/JLd_motion/JLd_motion_model.h5',compile=False)
-loaded_model.load_weights('/content/drive/MyDrive/UTD-MHAD/Features/Image/JLd_motion/JLd_motion_weights.h5')
+AlexNet.save('/content/drive/MyDrive/UTD-MHAD/Features/Image/PPa/PPa_model.h5')
+loaded_model=load_model('/content/drive/MyDrive/UTD-MHAD/Features/Image/PPa/PPa_model.h5',compile=False)
+loaded_model.load_weights('/content/drive/MyDrive/UTD-MHAD/Features/Image/PPa/PPa_weights.h5')
 validation_labels=val_generator.classes
 validation_labels = keras.utils.to_categorical(validation_labels, num_classes=27)
 
