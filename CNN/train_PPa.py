@@ -20,7 +20,6 @@ for sub_folder in os.listdir(folder):
 
 print("Total no. of validation images=",total)
 
-#importing necessary libraries and APIs
 import numpy as np
 import time
 import keras as keras
